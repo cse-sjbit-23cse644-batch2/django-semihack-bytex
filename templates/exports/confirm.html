@@ -46,14 +46,10 @@
       </div>
       <div class="card-body">
         <p class="small text-muted mb-3">
-          Downloads a complete <code>README.md</code> with live project
-          stats, CO-SDG mapping table, and 150-word SDG justification
-          — ready to submit as required by the SRS.
+          Downloads a complete README.md with live project stats,
+          CO-SDG mapping table, and 150-word SDG justification.
         </p>
-        
-          href="{% url 'export_readme' %}"
-          class="btn btn-dark btn-sm w-100"
-        >
+        <a href="{% url 'export_readme' %}" class="btn btn-dark btn-sm w-100">
           <i class="bi bi-markdown"></i> Download README.md
         </a>
       </div>
@@ -81,16 +77,16 @@
           <tbody>
             {% for project in projects %}
             <tr>
-              <td class="fw-semibold small">
-                {{ project.title|truncatechars:30 }}
-              </td>
+              <td class="fw-semibold small">{{ project.title|truncatechars:30 }}</td>
               <td>
                 <span class="badge bg-secondary">{{ project.domain }}</span>
               </td>
               <td class="small">
                 {% if project.guide %}
                   {{ project.guide.get_full_name|default:project.guide.username }}
-                {% else %}—{% endif %}
+                {% else %}
+                  —
+                {% endif %}
               </td>
               <td class="small">{{ project.members.count }} member(s)</td>
               <td style="min-width:120px">

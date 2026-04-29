@@ -383,7 +383,6 @@ def coordinator_approve(request, pk):
     project    = get_object_or_404(Project, pk=pk)
     evaluation = get_object_or_404(Evaluation, project=project)
 
-    # coordinator can only act after guide has submitted
     if not evaluation.guide_has_submitted():
         messages.warning(
             request,
@@ -398,13 +397,21 @@ def coordinator_approve(request, pk):
             instance=evaluation
         )
         if form.is_valid():
-            eval_obj = form.save(commit=False)
-            eval_obj.coordinator_approved_at = timezone.now()
-            eval_obj.save()
+            # save form fields directly to avoid commit=False issues
+            evaluation.coordinator_approval  = form.cleaned_data['coordinator_approval']
+            evaluation.coordinator_comments  = form.cleaned_data['coordinator_comments']
+            evaluation.publication_status    = form.cleaned_data['publication_status']
+            evaluation.coordinator_approved_at = timezone.now()
+
+            # handle certificate file separately
+            if 'certificate_copy' in request.FILES:
+                evaluation.certificate_copy = request.FILES['certificate_copy']
+
+            evaluation.save()
 
             messages.success(
                 request,
-                f'Evaluation for "{project.title}" '
+                f'Evaluation for "{project.title}" updated — '
                 f'{evaluation.get_coordinator_approval_display()}.'
             )
             return redirect('project_detail', pk=pk)

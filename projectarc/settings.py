@@ -11,10 +11,6 @@ ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(','
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-DEBUG = True
-
-ALLOWED_HOSTS = []
-
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",

@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% block title %}Export — ProjectArc{% endblock %}
+
+{% block content %}
+
+<div class="mb-4">
+  <h4><i class="bi bi-download"></i> Export Data</h4>
+  <small class="text-muted">Download filtered CSV or project README</small>
+</div>
+
+<div class="row">
+
+  <div class="col-md-4">
+
+    <div class="card mb-3">
+      <div class="card-header"><i class="bi bi-funnel"></i> CSV Filters</div>
+      <div class="card-body">
+        <form method="get" id="filter-form">
+          <div class="mb-3">
+            <label class="form-label fw-semibold small">Guide</label>
+            {{ form.guide }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold small">Domain</label>
+            {{ form.domain }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold small">Publication Status</label>
+            {{ form.publication_status }}
+          </div>
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-outline-dark btn-sm">
+              <i class="bi bi-eye"></i> Preview
+            </button>
+            <button type="button" class="btn btn-dark btn-sm" id="download-btn">
+              <i class="bi bi-file-earmark-spreadsheet"></i> Download CSV
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <i class="bi bi-file-earmark-text"></i> README Export
+      </div>
+      <div class="card-body">
+        <p class="small text-muted mb-3">
+          Downloads a complete <code>README.md</code> with live project
+          stats, CO-SDG mapping table, and 150-word SDG justification
+          — ready to submit as required by the SRS.
+        </p>
+        
+          href="{% url 'export_readme' %}"
+          class="btn btn-dark btn-sm w-100"
+        >
+          <i class="bi bi-markdown"></i> Download README.md
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-table"></i> Preview</span>
+        <span class="badge bg-secondary">{{ count }} project(s)</span>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-sm table-hover mb-0 align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Title</th>
+              <th>Domain</th>
+              <th>Guide</th>
+              <th>Members</th>
+              <th>Progress</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for project in projects %}
+            <tr>
+              <td class="fw-semibold small">
+                {{ project.title|truncatechars:30 }}
+              </td>
+              <td>
+                <span class="badge bg-secondary">{{ project.domain }}</span>
+              </td>
+              <td class="small">
+                {% if project.guide %}
+                  {{ project.guide.get_full_name|default:project.guide.username }}
+                {% else %}—{% endif %}
+              </td>
+              <td class="small">{{ project.members.count }} member(s)</td>
+              <td style="min-width:120px">
+                <div class="d-flex align-items-center gap-2">
+                  <div class="progress flex-grow-1" style="height:6px">
+                    <div class="progress-bar bg-success"
+                      style="width:{{ project.completion_percent }}%"></div>
+                  </div>
+                  <small>{{ project.completion_percent }}%</small>
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="5" class="text-center text-muted py-4">
+                No projects match the selected filters.
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.getElementById('download-btn').addEventListener('click', function () {
+    var form   = document.getElementById('filter-form');
+    var params = new URLSearchParams(new FormData(form));
+    params.set('download', '1');
+    window.location.href = window.location.pathname + '?' + params.toString();
+  });
+</script>
+{% endblock %}
